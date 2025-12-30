@@ -20,13 +20,17 @@ export default function Home() {
   const [maxViews, setMaxViews] = useState("");
   const [result, setResult] = useState("");
   const [copied, setCopied] = useState(false);
+  const [loading, setLoading] = useState(false);
+
 
   async function submit() {
     setResult("");
     setCopied(false);
+    setLoading(true);
 
     if (!content) {
       setResult("Enter credentials");
+      setLoading(false);
       return;
     }
 
@@ -48,6 +52,9 @@ export default function Home() {
       setResult(data.url || data.error || "Unknown error");
     } catch {
       setResult("Request failed");
+    }
+    finally {
+      setLoading(false);
     }
   }
 
@@ -106,10 +113,22 @@ export default function Home() {
 
         <button
           onClick={submit}
-          className="w-full py-4 bg-blue-600 text-white font-semibold rounded-xl hover:bg-blue-700 transition shadow-md"
+          disabled={loading}
+          className={`w-full py-4 font-semibold rounded-xl transition shadow-md
+           ${loading
+              ? "bg-blue-400 cursor-not-allowed"
+              : "bg-blue-600 hover:bg-blue-700 text-white"}
+               `}
         >
-          Create Paste
+          {loading ? (
+            <div className="flex justify-center items-center">
+              <span className="h-6 w-6 animate-spin rounded-full border-4 border-white border-t-transparent" />
+            </div>
+          ) : (
+            "Create Paste"
+          )}
         </button>
+
 
         {result && (
           <div className="mt-4 flex flex-row gap-3 justify-between rounded-xl border bg-gray-50 p-4">

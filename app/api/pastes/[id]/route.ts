@@ -1,27 +1,26 @@
-import type { NextRequest } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import mongoose from "mongoose";
 import { connectDB } from "@/lib/db";
 import Paste from "@/models/Paste";
 import { now } from "@/lib/time";
 
-type Params = {
-    params: {
-        id: string;
-    };
-};
+export async function GET(
+    req: NextRequest,
+    context: { params: Promise<{ id: string }> } // ✅ REQUIRED by Next.js
+) {
+    const { id } = await context.params; // ✅ REQUIRED
 
-export async function GET(req: NextRequest, { params }: Params) {
     await connectDB();
 
-    if (!mongoose.Types.ObjectId.isValid(params.id)) {
-        return Response.json({ error: "Not found" }, { status: 404 });
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+        return NextResponse.json({ error: "Not found" }, { status: 404 });
     }
 
     const currentTime = now(req);
 
     const paste = await Paste.findOneAndUpdate(
         {
-            _id: params.id,
+            _id: id,
             $and: [
                 { $or: [{ expiresAt: null }, { expiresAt: { $gt: currentTime } }] },
                 {
@@ -37,10 +36,10 @@ export async function GET(req: NextRequest, { params }: Params) {
     );
 
     if (!paste) {
-        return Response.json({ error: "Not found" }, { status: 404 });
+        return NextResponse.json({ error: "Not found" }, { status: 404 });
     }
 
-    return Response.json({
+    return NextResponse.json({
         content: paste.content,
         remaining_views:
             paste.maxViews === null ? null : paste.maxViews - paste.views,

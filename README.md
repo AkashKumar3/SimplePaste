@@ -7,6 +7,9 @@ The project is implemented using modern, production-ready tooling with a focus o
 
 ---
 
+## Project Live Link
+- https://simplepaste-production.up.railway.app
+
 ## Project Overview
 
 **Core functionality:**
@@ -63,7 +66,11 @@ npm install
 ```
 
 ### Environment Variables
-    - Create a .env.local file with:
+    - Create a 
+```bash
+.env.local file with:
+
+```
 
 ```bash
 MONGODB_URI=<your-mongodb-uri>

@@ -136,7 +136,7 @@ export default function Home() {
               <>
                 <Link
                   href={result}
-                  className="text-blue-600 font-medium break-words hover:underline"
+                  className="text-blue-600 font-medium wrap-break-words hover:underline"
                 >
                   {result}
                 </Link>

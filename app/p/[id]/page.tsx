@@ -66,7 +66,7 @@ export default async function PastePage({ params }: PageProps) {
                     </div>
 
                     <div className="flex flex-wrap justify-between gap-2">
-                        <span className="font-medium text-gray-600">Expires</span>
+                        <span className="font-medium text-gray-600">Expire Time</span>
                         <span>
                             {paste.expiresAt
                                 ? new Date(paste.expiresAt).toLocaleString()

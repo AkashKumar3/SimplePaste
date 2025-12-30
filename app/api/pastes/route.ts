@@ -10,6 +10,7 @@ type CreatePasteBody = {
 };
 
 export async function POST(req: NextRequest) {
+    const base_url = process.env.BASE_URL;
     await connectDB();
 
     const body: CreatePasteBody = await req.json();
@@ -41,6 +42,6 @@ export async function POST(req: NextRequest) {
 
     return Response.json({
         id: paste._id.toString(),
-        url: `/p/${paste._id}`,
+        url: `${base_url}/p/${paste._id}`,
     });
 }

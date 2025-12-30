@@ -1,6 +1,7 @@
 "use client";
 import Link from "next/link";
 import { useState } from "react";
+import { Copy, CopyCheck } from 'lucide-react';
 
 type PastePayload = {
   content: string;
@@ -18,23 +19,23 @@ export default function Home() {
   const [ttl, setTtl] = useState("");
   const [maxViews, setMaxViews] = useState("");
   const [result, setResult] = useState("");
+  const [copied, setCopied] = useState(false);
 
   async function submit() {
     setResult("");
+    setCopied(false);
+
+    if (!content) {
+      setResult("Enter credentials");
+      return;
+    }
 
     const payload: PastePayload = { content };
     const ttlNum = Number(ttl);
     const maxViewsNum = Number(maxViews);
 
-    if (ttl && !isNaN(ttlNum) && ttlNum > 0) payload.ttl_seconds = ttlNum;
-    if (maxViews && !isNaN(maxViewsNum) && maxViewsNum > 0)
-      payload.max_views = maxViewsNum;
-    if (!content) {
-      return (
-        setResult("Enter Credientials")
-
-      )
-    }
+    if (ttl && ttlNum > 0) payload.ttl_seconds = ttlNum;
+    if (maxViews && maxViewsNum > 0) payload.max_views = maxViewsNum;
 
     try {
       const res = await fetch("/api/pastes", {
@@ -50,6 +51,12 @@ export default function Home() {
     }
   }
 
+  async function copyToClipboard() {
+    await navigator.clipboard.writeText(result);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  }
+
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col items-center py-12 px-4">
       <h1 className="text-5xl font-extrabold text-gray-900 mb-10">
@@ -60,6 +67,7 @@ export default function Home() {
         <label className="block text-gray-700 font-medium text-lg mb-2">
           Your Paste
         </label>
+
         <textarea
           placeholder="Paste your text here..."
           value={content}
@@ -78,10 +86,10 @@ export default function Home() {
               min={1}
               value={ttl}
               onChange={(e) => setTtl(e.target.value)}
-              placeholder="e.g., 3600"
-              className="w-full p-3 border border-gray-300 rounded-lg text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
             />
           </div>
+
           <div>
             <label className="block text-gray-600 text-sm mb-1">
               Max views (optional)
@@ -91,28 +99,36 @@ export default function Home() {
               min={1}
               value={maxViews}
               onChange={(e) => setMaxViews(e.target.value)}
-              placeholder="e.g., 10"
-              className="w-full p-3 border border-gray-300 rounded-lg text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
             />
           </div>
         </div>
 
         <button
           onClick={submit}
-          className="w-full py-4 bg-blue-600 text-white font-semibold rounded-xl hover:bg-blue-700 transition-all duration-200 shadow-md hover:shadow-lg"
+          className="w-full py-4 bg-blue-600 text-white font-semibold rounded-xl hover:bg-blue-700 transition shadow-md"
         >
           Create Paste
         </button>
 
         {result && (
-          <div className="mt-4 p-4 bg-gray-100 rounded-xl border border-gray-200 text-center break-words">
+          <div className="mt-4 flex flex-row gap-3 justify-between rounded-xl border bg-gray-50 p-4">
             {result.startsWith("http") ? (
-              <Link
-                href={result}
-                className="text-blue-600 font-medium hover:underline"
-              >
-                {result}
-              </Link>
+              <>
+                <Link
+                  href={result}
+                  className="text-blue-600 font-medium break-words hover:underline"
+                >
+                  {result}
+                </Link>
+
+                <button
+                  onClick={copyToClipboard}
+                  className="self-start rounded-lg border px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 transition"
+                >
+                  {copied ? <CopyCheck /> : <Copy />}
+                </button>
+              </>
             ) : (
               <span className="text-red-600 font-medium">{result}</span>
             )}
@@ -120,7 +136,7 @@ export default function Home() {
         )}
       </div>
 
-      <p className="mt-12 text-gray-500 text-sm text-center max-w-xl">
+      <p className="mt-12 text-gray-500 text-sm text-center">
         Developed by Akash Kumar
       </p>
     </div>
